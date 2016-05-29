@@ -32,12 +32,15 @@ import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
 import java.lang.ref.WeakReference;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+
 
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
@@ -57,6 +60,23 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
      * Handler message id for updating the time periodically in interactive mode.
      */
     private static final int MSG_UPDATE_TIME = 0;
+
+    /**
+     * Multiply the width of the square by this scaling factor to get the size of the margin in pixels.
+     * The margin is the gap around the outside of all elements, and the vertical gap between the
+     * horizontal inner elements.
+     */
+    private static float SCALE_FACTOR_MARGIN_PX = 0.025F;
+
+    /**
+     * Multiply the width of the square by this scaling factor to get the vertical height of the
+     * top and bottom elements in pixels.
+     */
+    private static float SCALE_FACTOR_VERTICAL_TOP_AND_BOTTOM_ELEMENTS_PX = 0.2255F;
+
+    private static float SCALE_FACTOR_VERTICAL_MIDDLE_ELEMENT_PX = 0.4486F;
+
+    private static final String TAG = RetroWatchFaceService.class.getSimpleName();
 
     @Override
     public Engine onCreateEngine() {
@@ -84,12 +104,16 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
-        final Handler mUpdateTimeHandler = new EngineHandler(this);
-        boolean mRegisteredTimeZoneReceiver = false;
-        Paint mBackgroundPaint;
-        Paint mTextPaint;
-        boolean mAmbient;
-        Time mTime;
+
+        private final Handler mUpdateTimeHandler = new EngineHandler(this);
+        private boolean mRegisteredTimeZoneReceiver = false;
+        private Paint mBackgroundPaint;
+        private Paint topPanelPaint;
+        private Paint middlePanelPaint;
+        private Paint bottomPanelPaint;
+        private Paint mTextPaint;
+        private boolean mAmbient;
+        private Time mTime;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -97,16 +121,25 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                 mTime.setToNow();
             }
         };
-        int mTapCount;
+        private int mTapCount;
 
-        float mXOffset;
-        float mYOffset;
+        private float mXOffset;
+        private float mYOffset;
+
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
-        boolean mLowBitAmbient;
+        private boolean mLowBitAmbient;
+        private Typeface peraltaTypeface;
+
+        private int watchFaceHeight;
+        private int watchFaceWidth;
+
+        private int marginPx;
+        private int shortBarHeightPx;
+        private int tallBarHeightPx;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -118,6 +151,39 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .setAcceptsTapEvents(true)
                     .build());
+
+//            Rect frame = holder.getSurfaceFrame();
+//            Log.d(TAG, "frame height=" + frame.height());
+//            Log.d(TAG, "frame width=" + frame.width());
+
+            holder.addCallback(new SurfaceHolder.Callback() {
+                @Override
+                public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                    Log.d(TAG, "Callback: surfaceCreated: surafaceHolder: width=" + surfaceHolder.getSurfaceFrame().width()
+                            + ", height=" + surfaceHolder.getSurfaceFrame().height());
+                    watchFaceHeight = (int) surfaceHolder.getSurfaceFrame().height();
+                    watchFaceWidth = (int) surfaceHolder.getSurfaceFrame().width();
+
+                    marginPx = (int) (SCALE_FACTOR_MARGIN_PX * watchFaceWidth);
+                    shortBarHeightPx = (int) (SCALE_FACTOR_VERTICAL_TOP_AND_BOTTOM_ELEMENTS_PX * watchFaceWidth);
+                    tallBarHeightPx = (int) (SCALE_FACTOR_VERTICAL_MIDDLE_ELEMENT_PX * watchFaceWidth);
+
+                    Log.d(TAG, "marginPx=" + marginPx);
+                    Log.d(TAG, "shortBarHeightPx=" + shortBarHeightPx);
+                    Log.d(TAG, "tallBarHeightPx=" + tallBarHeightPx);
+                }
+
+                @Override
+                public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+                    Log.d(TAG, "Callback: surfaceChanged: i=" + i + ", i1=" + i1 + ", i2=" + i2);
+                }
+
+                @Override
+                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                    Log.d(TAG, "Callback: surfaceDestroyed");
+                }
+            });
+
             Resources resources = RetroWatchFaceService.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
 
@@ -125,7 +191,19 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(resources.getColor(R.color.background));
 
             mTextPaint = new Paint();
-            mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mTextPaint = createTextPaint(resources.getColor(R.color.text_color));
+
+            topPanelPaint = new Paint();
+            topPanelPaint.setColor(resources.getColor(R.color.top_panel_background));
+
+            middlePanelPaint = new Paint();
+            middlePanelPaint.setColor(resources.getColor(R.color.middle_panel_background));
+
+            bottomPanelPaint = new Paint();
+            bottomPanelPaint.setColor(resources.getColor(R.color.bottom_panel_background));
+
+            peraltaTypeface = Typeface.createFromAsset(getAssets(), "fonts/Ultra.ttf");
+            mTextPaint.setTypeface(peraltaTypeface);
 
             mTime = new Time();
         }
@@ -249,18 +327,37 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
+
+           // Log.d(TAG, "onDraw: bounds: height=" + bounds.height() + ",width=" + bounds.width());
+
             // Draw the background.
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.BLACK);
             } else {
+                // Draw background
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+
+                // Draw top bar
+                Rect topBar = new Rect();
+                topBar.set(marginPx, marginPx, watchFaceWidth - marginPx, marginPx + shortBarHeightPx);
+                canvas.drawRect(topBar, topPanelPaint);
+
+                // Draw middle bar
+                Rect middleBar = new Rect();
+                middleBar.set(marginPx, marginPx * 2 + shortBarHeightPx, watchFaceWidth - marginPx, marginPx * 2 + shortBarHeightPx + tallBarHeightPx);
+                canvas.drawRect(middleBar, middlePanelPaint);
+
+                // Draw bottom bar
+                Rect bottomBar = new Rect();
+                bottomBar.set(marginPx, watchFaceHeight - marginPx - shortBarHeightPx, watchFaceWidth - marginPx, watchFaceHeight - marginPx);
+                canvas.drawRect(bottomBar, bottomPanelPaint);
             }
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
             String text = mAmbient
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
+                    : String.format("%d:%02d", mTime.hour, mTime.minute);
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
         }
 

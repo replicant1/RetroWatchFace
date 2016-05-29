@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#000000</color>
+    <color name="background">#69af8d</color>
+    <color name="top_panel_background">#05474a</color>
+    <color name="middle_panel_background">#dc3f19</color>
+    <color name="bottom_panel_background">#258480</color>
+    <color name="text_color">#f3efd0</color>
     <color name="background2">#000088</color>
     <color name="digital_text">#ffffff</color>
+
 </resources>
