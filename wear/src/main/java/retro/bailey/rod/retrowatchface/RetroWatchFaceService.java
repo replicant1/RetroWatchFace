@@ -37,6 +37,7 @@ import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
 import java.lang.ref.WeakReference;
+import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -110,7 +111,8 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         private Paint topPanelPaint;
         private Paint middlePanelPaint;
         private Paint bottomPanelPaint;
-        private Paint textPaint;
+        private Paint timeTextPaint;
+        private Paint dayNameTextPaint;
         private boolean mAmbient;
         private Time mTime;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -189,8 +191,11 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             backgroundPaint = new Paint();
             backgroundPaint.setColor(resources.getColor(R.color.background));
 
-            textPaint = new Paint();
-            textPaint = createTextPaint(resources.getColor(R.color.text_color));
+            timeTextPaint = new Paint();
+            timeTextPaint = createTextPaint(resources.getColor(R.color.text_color));
+
+            dayNameTextPaint =  new Paint();
+            dayNameTextPaint = createTextPaint(resources.getColor(R.color.text_color));
 
             topPanelPaint = new Paint();
             topPanelPaint.setColor(resources.getColor(R.color.top_panel_background));
@@ -202,7 +207,9 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             bottomPanelPaint.setColor(resources.getColor(R.color.bottom_panel_background));
 
             peraltaTypeface = Typeface.createFromAsset(getAssets(), "fonts/Ultra.ttf");
-            textPaint.setTypeface(peraltaTypeface);
+
+            timeTextPaint.setTypeface(peraltaTypeface);
+            dayNameTextPaint.setTypeface(peraltaTypeface);
 
             mTime = new Time();
         }
@@ -266,10 +273,16 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             boolean isRound = insets.isRound();
             mXOffset = resources.getDimension(isRound
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            float textSize = resources.getDimension(isRound
-                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
-            textPaint.setTextSize(textSize);
+            // Adjust text size for time
+            float timeTextSize = resources.getDimension(isRound
+                    ? R.dimen.time_text_size_round : R.dimen.time_text_size_square);
+            timeTextPaint.setTextSize(timeTextSize);
+
+            // Adjust text size for day name
+            float dayNameTextSize = resources.getDimension(isRound
+            ? R.dimen.day_name_text_size_round : R.dimen.day_name_text_size_square);
+            dayNameTextPaint.setTextSize(dayNameTextSize);
         }
 
         @Override
@@ -290,7 +303,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
                 if (lowBitAmbientModeSupported) {
-                    textPaint.setAntiAlias(!inAmbientMode);
+                    timeTextPaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -328,56 +341,105 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         public void onDraw(Canvas canvas, Rect bounds) {
 
             // Log.d(TAG, "onDraw: bounds: height=" + bounds.height() + ",width=" + bounds.width());
+            mTime.setToNow();
 
             // Draw the background.
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.BLACK);
             } else {
-                // Draw background
-                canvas.drawRect(0, 0, bounds.width(), bounds.height(), backgroundPaint);
-
-                // Draw top bar
-                Rect topBar = new Rect();
-                topBar.set(marginPx, marginPx, watchFaceWidth - marginPx, marginPx + shortBarHeightPx);
-                canvas.drawRect(topBar, topPanelPaint);
-
-                // Draw middle bar
-                Rect middleBar = new Rect();
-                middleBar.set(marginPx, marginPx * 2 + shortBarHeightPx, watchFaceWidth - marginPx, marginPx * 2 + shortBarHeightPx + tallBarHeightPx);
-                canvas.drawRect(middleBar, middlePanelPaint);
-
-                // Draw bottom bar
-                Rect bottomBar = new Rect();
-                bottomBar.set(marginPx, watchFaceHeight - marginPx - shortBarHeightPx, watchFaceWidth - marginPx, watchFaceHeight - marginPx);
-                canvas.drawRect(bottomBar, bottomPanelPaint);
+                drawBars(canvas, bounds);
+                drawTimeInMiddleBar(canvas);
+                drawDayInTopBar(canvas);
             }
+        }
 
+        private void drawBars(Canvas canvas, Rect bounds) {
+            // Draw background
+            canvas.drawRect(0, 0, bounds.width(), bounds.height(), backgroundPaint);
+
+            // Draw top bar
+            Rect topBar = new Rect();
+            topBar.set(marginPx, marginPx, watchFaceWidth - marginPx, marginPx + shortBarHeightPx);
+            canvas.drawRect(topBar, topPanelPaint);
+
+            // Draw middle bar
+            Rect middleBar = new Rect();
+            middleBar.set(marginPx, marginPx * 2 + shortBarHeightPx, watchFaceWidth - marginPx, marginPx * 2 + shortBarHeightPx + tallBarHeightPx);
+            canvas.drawRect(middleBar, middlePanelPaint);
+
+            // Draw bottom bar
+            Rect bottomBar = new Rect();
+            bottomBar.set(marginPx, watchFaceHeight - marginPx - shortBarHeightPx, watchFaceWidth - marginPx, watchFaceHeight - marginPx);
+            canvas.drawRect(bottomBar, bottomPanelPaint);
+        }
+
+        /**
+         * Draws the full name of the current day of the week (eg. "Monday") in the center of the
+         * top bar.
+         * @param canvas
+         */
+        private void drawDayInTopBar(Canvas canvas) {
+            Calendar cal = Calendar.getInstance();
+            String dayName = mTime.format("%A");
+            Log.d(TAG, "dayName=" + dayName);
+
+            Paint.FontMetricsInt fontMetricsInt = dayNameTextPaint.getFontMetricsInt();
+            int dayNameHeightPx = fontMetricsInt.ascent * -1;
+            int dayNameWidthPx = (int) dayNameTextPaint.measureText(dayName);
+
+            float centerX = watchFaceWidth / 2.0F;
+            float centerDayNameY = marginPx + (shortBarHeightPx / 2);
+            dayNameTextPaint.setTextAlign(Paint.Align.CENTER);
+
+          /*  canvas.drawRect(
+                    centerX - (dayNameWidthPx /2), // left
+                    centerDayNameY - (dayNameHeightPx / 2), // top
+                    centerX + (dayNameWidthPx / 2), // right
+                    centerDayNameY + (dayNameHeightPx / 2), // bottom
+                    middlePanelPaint);*/
+
+            canvas.drawText(
+                    dayName, // "Monday"
+                    centerX, //
+                    centerDayNameY - ((fontMetricsInt.ascent + fontMetricsInt.descent) / 2), //
+                    dayNameTextPaint);
+
+        }
+
+        /**
+         * Draws the current time in the middle bar running horizontally across the middle of the screen.
+         *
+         * @param canvas
+         */
+        private void drawTimeInMiddleBar(Canvas canvas) {
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
-            mTime.setToNow();
+            // TODO: 24 hour or am/pm?
+
             String timeText = mAmbient
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d", mTime.hour, mTime.minute);
 
-            Paint.FontMetricsInt textFontMetricsInt = textPaint.getFontMetricsInt();
+            Paint.FontMetricsInt textFontMetricsInt = timeTextPaint.getFontMetricsInt();
             int timeHeightPx = textFontMetricsInt.ascent * -1;
-            int timeWidthPx = (int) textPaint.measureText(timeText);
+            int timeWidthPx = (int) timeTextPaint.measureText(timeText);
 
             float centerX = watchFaceWidth / 2.0F;
             float centerY = watchFaceHeight / 2.0F;
-            textPaint.setTextAlign(Paint.Align.CENTER);
+            timeTextPaint.setTextAlign(Paint.Align.CENTER);
 
+            /*
             canvas.drawRect(
                     centerX - (timeWidthPx / 2), // left
                     centerY - (timeHeightPx / 2), // top
                     centerX + (timeWidthPx / 2), // right
                     centerY + (timeHeightPx / 2), // bottom
-                    topPanelPaint);
+                    topPanelPaint); */
 
             canvas.drawText(
                     timeText, // "12:37"
                     centerX,
                     centerY - ((textFontMetricsInt.ascent + textFontMetricsInt.descent) / 2),
-                    textPaint);
+                    timeTextPaint);
 
             Log.d(TAG, String.format("timeHeightPx= %d, timeWidthPx = %d, centreX = %f, centreY = %f, ascent = %d, descent = %d",
                     timeHeightPx, timeWidthPx, centerX, centerY, textFontMetricsInt.ascent, textFontMetricsInt.descent));
