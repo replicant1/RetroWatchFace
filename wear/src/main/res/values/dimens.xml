@@ -9,8 +9,8 @@
     <dimen name="day_name_text_size_round">24dp</dimen>
 
     <!-- Size of the text taht the date (eg. "25 May 2016") is rendered in the bottom bar -->
-    <dimen name="date_text_size_square">36dp</dimen>
-    <dimen name="date_text_size_round">40dp</dimen>
+    <dimen name="date_text_size_square">20dp</dimen>
+    <dimen name="date_text_size_round">24dp</dimen>
 
     <dimen name="digital_x_offset">15dp</dimen>
     <dimen name="digital_x_offset_round">25dp</dimen>

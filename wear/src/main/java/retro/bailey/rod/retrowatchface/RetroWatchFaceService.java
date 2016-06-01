@@ -141,6 +141,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         private int marginPx;
         private int shortBarHeightPx;
         private int tallBarHeightPx;
+        private Paint dateTextPaint;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -197,6 +198,9 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             dayNameTextPaint =  new Paint();
             dayNameTextPaint = createTextPaint(resources.getColor(R.color.text_color));
 
+            dateTextPaint = new Paint();
+            dateTextPaint = createTextPaint(resources.getColor(R.color.text_color));
+
             topPanelPaint = new Paint();
             topPanelPaint.setColor(resources.getColor(R.color.top_panel_background));
 
@@ -210,6 +214,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
 
             timeTextPaint.setTypeface(peraltaTypeface);
             dayNameTextPaint.setTypeface(peraltaTypeface);
+            dateTextPaint.setTypeface(peraltaTypeface);
 
             mTime = new Time();
         }
@@ -283,6 +288,10 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             float dayNameTextSize = resources.getDimension(isRound
             ? R.dimen.day_name_text_size_round : R.dimen.day_name_text_size_square);
             dayNameTextPaint.setTextSize(dayNameTextSize);
+
+            // Adjust text size for date
+            float dateTextSize = resources.getDimension(isRound ? R.dimen.date_text_size_round : R.dimen.date_text_size_square);
+            dateTextPaint.setTextSize(dateTextSize);
         }
 
         @Override
@@ -350,6 +359,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                 drawBars(canvas, bounds);
                 drawTimeInMiddleBar(canvas);
                 drawDayInTopBar(canvas);
+                drawDateInBottomBar(canvas);
             }
         }
 
@@ -443,6 +453,41 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
 
             Log.d(TAG, String.format("timeHeightPx= %d, timeWidthPx = %d, centreX = %f, centreY = %f, ascent = %d, descent = %d",
                     timeHeightPx, timeWidthPx, centerX, centerY, textFontMetricsInt.ascent, textFontMetricsInt.descent));
+        }
+
+        /**
+         * Draws the current date in the bottom bar running horizontally across the bottoom of the
+         * screen. eg. "28 May 2016"
+         *
+         * @param canvas
+         */
+        private void drawDateInBottomBar(Canvas canvas) {
+            String dateStr = mTime.format("%e %B").trim();
+            Log.d(TAG, "dateStr=" + dateStr);
+
+            Paint.FontMetricsInt textFontMetricsInt = dateTextPaint.getFontMetricsInt();
+            int dateHeightPx = textFontMetricsInt.ascent * - 1;
+            int dateWidthPx = (int) dateTextPaint.measureText(dateStr);
+
+            Log.d(TAG, "dateWidth=" + dateWidthPx);
+
+            float centerX = watchFaceWidth / 2.0F;
+            float centerYOfBottomBar = watchFaceHeight - marginPx - (shortBarHeightPx / 2);
+
+            dateTextPaint.setTextAlign(Paint.Align.CENTER);
+
+          /*  canvas.drawRect(
+                    centerX - (dateWidthPx / 2), // left
+                    centerYOfBottomBar- (dateHeightPx / 2), // top
+                    centerX + (dateWidthPx / 2), // right
+                    centerYOfBottomBar + (dateHeightPx / 2), // bottom
+                    middlePanelPaint);*/
+
+            canvas.drawText(
+                    dateStr, // "12 JUN 2016"
+                    centerX,
+                    centerYOfBottomBar - ((textFontMetricsInt.ascent + textFontMetricsInt.descent) /2),
+                    dateTextPaint);
         }
 
         /**
