@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">RetroWatchFace</string>
     <string name="my_digital_name">Retro</string>
+    <string name="title_activity_retro_watch_face_configuration">
+        RetroWatchFaceConfigurationActivity
+    </string>
 </resources>
