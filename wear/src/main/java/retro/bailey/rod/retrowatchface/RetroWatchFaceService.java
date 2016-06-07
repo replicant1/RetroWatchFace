@@ -36,6 +36,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,6 +45,8 @@ import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import retro.bailey.rod.retrowatchface.config.Themes;
 
 
 /**
@@ -169,8 +173,16 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                 }
             }
 
+            String jsonString = buffer.toString();
+
             // By the time we get here, 'buffer' contains the JSON string from assets/themes.json
-            Log.i(TAG, "Read themes.json: " + buffer.toString());
+            Log.i(TAG, "Read themes.json: " + jsonString);
+
+            // Parse the JSON string into an object graph
+            Gson gson = new Gson();
+            Themes themes = gson.fromJson(jsonString, Themes.class);
+
+            Log.i(TAG, "As read in from theme.json, object graph is:" + themes.toString());
         }
 
         @Override

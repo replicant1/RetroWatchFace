@@ -5,8 +5,21 @@ package retro.bailey.rod.retrowatchface.config;
  */
 public class Theme {
     public String name;
-    public String backgroundColour;
+    public String backgroundColor;
     public ThemedPanel day;
     public ThemedPanel time;
     public ThemedPanel date;
+
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer(super.toString() + ":");
+
+        buf.append("name=" + name);
+        buf.append(",backgroundColor=" + backgroundColor);
+        buf.append(",day=" + day);
+        buf.append(",time=" + time);
+        buf.append(",date=" + date);
+
+        return buf.toString();
+    }
 }
