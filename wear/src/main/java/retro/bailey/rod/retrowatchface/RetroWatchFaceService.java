@@ -36,6 +36,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -143,9 +146,39 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         private int tallBarHeightPx;
         private Paint dateTextPaint;
 
+        private void initThemes() {
+            BufferedReader reader = null;
+            StringBuffer buffer = new StringBuffer();
+
+            try {
+                reader = new BufferedReader(new InputStreamReader(getAssets().open("themes.json")));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+            } catch (IOException iox) {
+                Log.w(TAG, iox);
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        Log.w(TAG, e);
+                    }
+                }
+            }
+
+            // By the time we get here, 'buffer' contains the JSON string from assets/themes.json
+            Log.i(TAG, "Read themes.json: " + buffer.toString());
+        }
+
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
+
+            // Read in themes.json
+            initThemes();
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(RetroWatchFaceService.this)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
@@ -195,7 +228,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             timeTextPaint = new Paint();
             timeTextPaint = createTextPaint(resources.getColor(R.color.text_color));
 
-            dayNameTextPaint =  new Paint();
+            dayNameTextPaint = new Paint();
             dayNameTextPaint = createTextPaint(resources.getColor(R.color.text_color));
 
             dateTextPaint = new Paint();
@@ -286,7 +319,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
 
             // Adjust text size for day name
             float dayNameTextSize = resources.getDimension(isRound
-            ? R.dimen.day_name_text_size_round : R.dimen.day_name_text_size_square);
+                    ? R.dimen.day_name_text_size_round : R.dimen.day_name_text_size_square);
             dayNameTextPaint.setTextSize(dayNameTextSize);
 
             // Adjust text size for date
@@ -386,6 +419,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         /**
          * Draws the full name of the current day of the week (eg. "Monday") in the center of the
          * top bar.
+         *
          * @param canvas
          */
         private void drawDayInTopBar(Canvas canvas) {
@@ -466,7 +500,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             Log.d(TAG, "dateStr=" + dateStr);
 
             Paint.FontMetricsInt textFontMetricsInt = dateTextPaint.getFontMetricsInt();
-            int dateHeightPx = textFontMetricsInt.ascent * - 1;
+            int dateHeightPx = textFontMetricsInt.ascent * -1;
             int dateWidthPx = (int) dateTextPaint.measureText(dateStr);
 
             Log.d(TAG, "dateWidth=" + dateWidthPx);
@@ -486,7 +520,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             canvas.drawText(
                     dateStr, // "12 JUN 2016"
                     centerX,
-                    centerYOfBottomBar - ((textFontMetricsInt.ascent + textFontMetricsInt.descent) /2),
+                    centerYOfBottomBar - ((textFontMetricsInt.ascent + textFontMetricsInt.descent) / 2),
                     dateTextPaint);
         }
 

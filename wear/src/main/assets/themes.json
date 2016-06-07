@@ -1,0 +1,23 @@
+{
+  "themes": [
+    {
+      "name": "Marine",
+      "backgroundColor": "#88977",
+      "day": {
+        "backgroundColor": "#11223a",
+        "textColor": "#aabbcc",
+        "textFont": "fonts/Ultra.ttf"
+      },
+      "time": {
+        "backgroundColor": "#abc",
+        "textColor": "#abc",
+        "textFont": "fonts/Ultra.ttf"
+      },
+      "date": {
+        "backgroundColor": "#abc",
+        "textColor": "#abc",
+        "textFont": "fonts/Ultra.ttf"
+      }
+    }
+  ]
+}
