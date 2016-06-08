@@ -2,21 +2,68 @@
   "themes": [
     {
       "name": "Marine",
-      "backgroundColor": "#88977",
+      "backgroundColor": "#69af8d",
       "day": {
-        "backgroundColor": "#11223a",
-        "textColor": "#aabbcc",
-        "textFont": "fonts/Ultra.ttf"
+        "backgroundColor": "#05474a",
+        "textColor": "#f3efd0",
+        "textFont": "fonts/Ultra.ttf",
+        "textSize": "24sp"
       },
       "time": {
-        "backgroundColor": "#abc",
-        "textColor": "#abc",
-        "textFont": "fonts/Ultra.ttf"
+        "backgroundColor": "#dc3f19",
+        "textColor": "#f3efd0",
+        "textFont": "fonts/Ultra.ttf",
+        "textSize": "32sp"
       },
       "date": {
-        "backgroundColor": "#abc",
-        "textColor": "#abc",
-        "textFont": "fonts/Ultra.ttf"
+        "backgroundColor": "#258480",
+        "textColor": "#f3efd0",
+        "textFont": "fonts/Ultra.ttf",
+        "textSize": "24sp"
+      }
+    },
+    {
+      "name": "Orange",
+      "backgroundColor": "#000000",
+      "day": {
+        "backgroundColor": "#db8d35",
+        "textColor": "#000000",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#db8d35",
+        "textColor": "#000000",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "96sp"
+      },
+      "date": {
+        "backgroundColor": "#db8d35",
+        "textColor": "#000000",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      }
+    },
+    {
+      "name": "Rose",
+      "backgroundColor": "#ab2132",
+      "day": {
+        "backgroundColor": "#d9caae",
+        "textColor": "#ab2132",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#d9caae",
+        "textColor": "#ab2132",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "96sp"
+      },
+      "date": {
+        "backgroundColor": "#d9caae",
+        "textColor": "#ab2132",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
       }
     }
   ]

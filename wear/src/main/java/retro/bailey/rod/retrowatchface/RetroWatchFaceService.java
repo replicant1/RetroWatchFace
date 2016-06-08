@@ -29,6 +29,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
@@ -46,6 +47,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import retro.bailey.rod.retrowatchface.config.Theme;
 import retro.bailey.rod.retrowatchface.config.Themes;
 
 
@@ -115,9 +117,9 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         private final Handler mUpdateTimeHandler = new EngineHandler(this);
         private boolean mRegisteredTimeZoneReceiver = false;
         private Paint backgroundPaint;
-        private Paint topPanelPaint;
-        private Paint middlePanelPaint;
-        private Paint bottomPanelPaint;
+        private Paint dayNameBackgroundPaint;
+        private Paint timeBackgroundPaint;
+        private Paint dateBackgroundPaint;
         private Paint timeTextPaint;
         private Paint dayNameTextPaint;
         private boolean mAmbient;
@@ -131,16 +133,11 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         };
         private int mTapCount;
 
-        private float mXOffset;
-        private float mYOffset;
-
-
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
         private boolean lowBitAmbientModeSupported;
-        private Typeface peraltaTypeface;
 
         private int watchFaceHeight;
         private int watchFaceWidth;
@@ -150,7 +147,41 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         private int tallBarHeightPx;
         private Paint dateTextPaint;
 
-        private void initThemes() {
+        // Current theme for watch face (colors and fonts)
+        private Theme theme;
+
+        /**
+         * Invoked whenever the theme of the watch face is changed, either by the user or the system.
+         *
+         * @param newTheme The new theme to be adopted.
+         */
+        private void onThemeChange(Theme newTheme) {
+            theme = newTheme;
+
+            Resources resources = RetroWatchFaceService.this.getResources();
+
+            // Full background is filled with this color as first step of drawing. WHen done, this
+            // color only shows through in the margins between the bars.
+            backgroundPaint = new Paint();
+            backgroundPaint.setColor(Color.parseColor(theme.backgroundColor));
+
+            // Top most bar contains the day name e.g. "Tuesday"
+            dayNameBackgroundPaint = new Paint();
+            dayNameBackgroundPaint.setColor(Color.parseColor(theme.day.backgroundColor));
+            dayNameTextPaint = createTextPaint(Color.parseColor(theme.day.textColor), theme.day.textFont, theme.day.textSize);
+
+            // Middle bar contains the time e.g. "12:33"
+            timeBackgroundPaint = new Paint();
+            timeBackgroundPaint.setColor(Color.parseColor(theme.time.backgroundColor));
+            timeTextPaint = createTextPaint(Color.parseColor(theme.time.textColor), theme.time.textFont, theme.time.textSize);
+
+            // Bottom bar contains the date e.g. "20 February"
+            dateBackgroundPaint = new Paint();
+            dateBackgroundPaint.setColor(Color.parseColor(theme.date.backgroundColor));
+            dateTextPaint = createTextPaint(Color.parseColor(theme.date.textColor), theme.date.textFont, theme.date.textSize);
+        }
+
+        private Theme initThemes() {
             BufferedReader reader = null;
             StringBuffer buffer = new StringBuffer();
 
@@ -183,14 +214,16 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             Themes themes = gson.fromJson(jsonString, Themes.class);
 
             Log.i(TAG, "As read in from theme.json, object graph is:" + themes.toString());
+
+            // Return the initially selected theme
+            return themes.themes.get(2);
         }
 
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
 
-            // Read in themes.json
-            initThemes();
+            onThemeChange(initThemes());
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(RetroWatchFaceService.this)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
@@ -198,10 +231,6 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .setAcceptsTapEvents(true)
                     .build());
-
-//            Rect frame = holder.getSurfaceFrame();
-//            Log.d(TAG, "frame height=" + frame.height());
-//            Log.d(TAG, "frame width=" + frame.width());
 
             holder.addCallback(new SurfaceHolder.Callback() {
                 @Override
@@ -231,36 +260,6 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                 }
             });
 
-            Resources resources = RetroWatchFaceService.this.getResources();
-            mYOffset = resources.getDimension(R.dimen.digital_y_offset);
-
-            backgroundPaint = new Paint();
-            backgroundPaint.setColor(resources.getColor(R.color.background));
-
-            timeTextPaint = new Paint();
-            timeTextPaint = createTextPaint(resources.getColor(R.color.text_color));
-
-            dayNameTextPaint = new Paint();
-            dayNameTextPaint = createTextPaint(resources.getColor(R.color.text_color));
-
-            dateTextPaint = new Paint();
-            dateTextPaint = createTextPaint(resources.getColor(R.color.text_color));
-
-            topPanelPaint = new Paint();
-            topPanelPaint.setColor(resources.getColor(R.color.top_panel_background));
-
-            middlePanelPaint = new Paint();
-            middlePanelPaint.setColor(resources.getColor(R.color.middle_panel_background));
-
-            bottomPanelPaint = new Paint();
-            bottomPanelPaint.setColor(resources.getColor(R.color.bottom_panel_background));
-
-            peraltaTypeface = Typeface.createFromAsset(getAssets(), "fonts/Ultra.ttf");
-
-            timeTextPaint.setTypeface(peraltaTypeface);
-            dayNameTextPaint.setTypeface(peraltaTypeface);
-            dateTextPaint.setTypeface(peraltaTypeface);
-
             mTime = new Time();
         }
 
@@ -270,11 +269,18 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             super.onDestroy();
         }
 
-        private Paint createTextPaint(int textColor) {
+        private Paint createTextPaint(int textColor, String textFont, String textSize) {
             Paint paint = new Paint();
+
             paint.setColor(textColor);
-            paint.setTypeface(NORMAL_TYPEFACE);
             paint.setAntiAlias(true);
+            paint.setTypeface(Typeface.createFromAsset(getAssets(), textFont));
+
+            String textSizeStr = textSize.substring(0, textSize.length() - 2);
+            Log.d(TAG, "textSize=" + textSize + ", textSizeStr=" + textSizeStr);
+
+            paint.setTextSize(Float.parseFloat(textSizeStr));
+
             return paint;
         }
 
@@ -321,8 +327,6 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = RetroWatchFaceService.this.getResources();
             boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
-                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
 
             // Adjust text size for time
             float timeTextSize = resources.getDimension(isRound
@@ -412,20 +416,20 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             // Draw background
             canvas.drawRect(0, 0, bounds.width(), bounds.height(), backgroundPaint);
 
-            // Draw top bar
+            // Draw top bar that contains the name of the day of week
             Rect topBar = new Rect();
             topBar.set(marginPx, marginPx, watchFaceWidth - marginPx, marginPx + shortBarHeightPx);
-            canvas.drawRect(topBar, topPanelPaint);
+            canvas.drawRect(topBar, dayNameBackgroundPaint);
 
-            // Draw middle bar
+            // Draw middle bar that contains the time
             Rect middleBar = new Rect();
             middleBar.set(marginPx, marginPx * 2 + shortBarHeightPx, watchFaceWidth - marginPx, marginPx * 2 + shortBarHeightPx + tallBarHeightPx);
-            canvas.drawRect(middleBar, middlePanelPaint);
+            canvas.drawRect(middleBar, timeBackgroundPaint);
 
-            // Draw bottom bar
+            // Draw bottom bar that contains the date
             Rect bottomBar = new Rect();
             bottomBar.set(marginPx, watchFaceHeight - marginPx - shortBarHeightPx, watchFaceWidth - marginPx, watchFaceHeight - marginPx);
-            canvas.drawRect(bottomBar, bottomPanelPaint);
+            canvas.drawRect(bottomBar, dateBackgroundPaint);
         }
 
         /**
