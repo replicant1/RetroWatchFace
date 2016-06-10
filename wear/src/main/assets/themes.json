@@ -65,6 +65,94 @@
         "textFont": "fonts/Oswald-Regular.ttf",
         "textSize": "36sp"
       }
+    },
+    {
+      "name": "Orbitron",
+      "backgroundColor": "#fefefe",
+      "day": {
+        "backgroundColor": "#dc872b",
+        "textColor": "#000000",
+        "textFont": "fonts/Orbitron-Medium.ttf",
+        "textSize": "30sp"
+      },
+      "time": {
+        "backgroundColor": "#a0af53",
+        "textColor": "#000000",
+        "textFont": "fonts/Orbitron-Medium.ttf",
+        "textSize": "72dp"
+      },
+      "date": {
+        "backgroundColor": "#fde475",
+        "textColor": "#000000",
+        "textFont": "fonts/Orbitron-Medium.ttf",
+        "textSize": "30dsp"
+      }
+    },
+    {
+      "name": "Soda Pop",
+      "backgroundColor": "#fefefe",
+      "day": {
+        "backgroundColor": "#fbf5dd",
+        "textColor": "#c22a2a",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#5fc5cd",
+        "textColor": "#05474a",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "72sp"
+      },
+      "date": {
+        "backgroundColor": "#2f2e27",
+        "textColor": "#fefefe",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      }
+    },
+    {
+      "name": "Art Deco",
+      "backgroundColor": "#dac48c",
+      "day": {
+        "backgroundColor": "#c86a24",
+        "textColor": "#000000",
+        "textFont": "fonts/Limelight-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#c48725",
+        "textColor": "#000000",
+        "textFont": "fonts/Limelight-Regular.ttf",
+        "textSize": "72sp"
+      },
+      "date": {
+        "backgroundColor": "#849b9c",
+        "textColor": "#000000",
+        "textFont": "Fonts/Limelight-Regular.ttf",
+        "textSize": "36sp"
+      }
+    },
+    {
+      "name": "Diner",
+      "backgroundColor": "#fceb77",
+      "day": {
+        "backgroundColor": "#e8d37e",
+        "textColor": "#000000",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#c22a2a",
+        "textColor": "#fceb77",
+        "textFont": "fonts/AbrilFatface-Regular.ttf",
+        "textSize": "96sp"
+      },
+      "date": {
+        "backgroundColor": "#8ec891",
+        "textColor": "#000000",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      }
     }
   ]
 }
