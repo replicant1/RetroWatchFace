@@ -153,6 +153,116 @@
         "textFont": "fonts/Oswald-Regular.ttf",
         "textSize": "36sp"
       }
+    },
+    {
+      "name": "Pastel Deco",
+      "backgroundColor": "#ededcf",
+      "day": {
+        "backgroundColor": "#bdc1a2",
+        "textColor": "#000000",
+        "textFont": "fonts/Limelight-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#df9371",
+        "textColor": "#fceb77",
+        "textFont": "fonts/Limelight-Regular.ttf",
+        "textSize": "72sp"
+      },
+      "date": {
+        "backgroundColor": "#cba759",
+        "textColor": "#000000",
+        "textFont": "fonts/Limelight-Regular.ttf",
+        "textSize": "72sp"
+      }
+    },
+    {
+      "name": "Slacky",
+      "backgroundColor": "#ededcf",
+      "day": {
+        "backgroundColor": "#b8ddad",
+        "textColor": "#000000",
+        "textFont": "fonts/Slacky.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#dda446",
+        "textColor": "#000000",
+        "textFont": "fonts/Slacky.ttf",
+        "textSize": "72sp"
+      },
+      "date": {
+        "backgroundColor": "#0c6577",
+        "textColor": "#000000",
+        "textFont": "fonts/Slacky.ttf",
+        "textSize": "36sp"
+      }
+    },
+    {
+      "name": "Slacky Modern",
+      "backgroundColor": "#ededcf",
+      "day": {
+        "backgroundColor": "#f7de7f",
+        "textColor": "#e6663a",
+        "textFont": "fonts/Slacky.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#bea05f",
+        "textColor": "#434343",
+        "textFont": "fonts/Slacky.ttf",
+        "textSize": "72sp"
+      },
+      "date": {
+        "backgroundColor": "#e6663a",
+        "textColor": "#feeaad",
+        "textFont": "fonts/Slacky.ttf",
+        "textSize": "36sp"
+      }
+    },
+    {
+      "name": "Rose",
+      "backgroundColor": "#ab2132",
+      "day": {
+        "backgroundColor": "#d9caae",
+        "textColor": "#ab2132",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      },
+      "time": {
+        "backgroundColor": "#d9caae",
+        "textColor": "#ab2132",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "96sp"
+      },
+      "date": {
+        "backgroundColor": "#d9caae",
+        "textColor": "#ab2132",
+        "textFont": "fonts/Oswald-Regular.ttf",
+        "textSize": "36sp"
+      }
+    },
+    {
+      "name": "Chrome",
+      "backgroundColor": "#000000",
+      "day": {
+        "backgroundColor": "#dbbb8a",
+        "textColor": "#000000",
+        "textFont": "fonts/Lobster-Regular.ttf",
+        "textSize": "48sp"
+      },
+      "time": {
+        "backgroundColor": "#d41700",
+        "textColor": "#f0ca94",
+        "textFont": "fonts/Limelight-Regular.ttf",
+        "textSize": "96sp"
+      },
+      "date": {
+        "backgroundColor": "#dbbb8a",
+        "textColor": "#000000",
+        "textFont": "fonts/Lobster-Regular.ttf",
+        "textSize": "48sp"
+      }
     }
   ]
 }
