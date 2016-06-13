@@ -216,7 +216,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
             Log.i(TAG, "As read in from theme.json, object graph is:" + themes.toString());
 
             // Return the initially selected theme
-            return themes.themes.get(2);
+            return themes.themes.get(0); // 0 = Marine
         }
 
         @Override

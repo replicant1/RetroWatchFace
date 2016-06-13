@@ -128,7 +128,7 @@
       "date": {
         "backgroundColor": "#849b9c",
         "textColor": "#000000",
-        "textFont": "Fonts/Limelight-Regular.ttf",
+        "textFont": "fonts/Limelight-Regular.ttf",
         "textSize": "36sp"
       }
     },
@@ -177,46 +177,46 @@
       }
     },
     {
-      "name": "Slacky",
+      "name": "Slackey",
       "backgroundColor": "#ededcf",
       "day": {
         "backgroundColor": "#b8ddad",
         "textColor": "#000000",
-        "textFont": "fonts/Slacky.ttf",
+        "textFont": "fonts/Slackey.ttf",
         "textSize": "36sp"
       },
       "time": {
         "backgroundColor": "#dda446",
         "textColor": "#000000",
-        "textFont": "fonts/Slacky.ttf",
+        "textFont": "fonts/Slackey.ttf",
         "textSize": "72sp"
       },
       "date": {
         "backgroundColor": "#0c6577",
         "textColor": "#000000",
-        "textFont": "fonts/Slacky.ttf",
+        "textFont": "fonts/Slackey.ttf",
         "textSize": "36sp"
       }
     },
     {
-      "name": "Slacky Modern",
+      "name": "Slackey Modern",
       "backgroundColor": "#ededcf",
       "day": {
         "backgroundColor": "#f7de7f",
         "textColor": "#e6663a",
-        "textFont": "fonts/Slacky.ttf",
+        "textFont": "fonts/Slackey.ttf",
         "textSize": "36sp"
       },
       "time": {
         "backgroundColor": "#bea05f",
         "textColor": "#434343",
-        "textFont": "fonts/Slacky.ttf",
+        "textFont": "fonts/Slackey.ttf",
         "textSize": "72sp"
       },
       "date": {
         "backgroundColor": "#e6663a",
         "textColor": "#feeaad",
-        "textFont": "fonts/Slacky.ttf",
+        "textFont": "fonts/Slackey.ttf",
         "textSize": "36sp"
       }
     },
