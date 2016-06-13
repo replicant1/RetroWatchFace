@@ -6,10 +6,16 @@ import android.app.Activity;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
 
 import retro.bailey.rod.retrowatchface.R;
+import retro.bailey.rod.retrowatchface.config.*;
 
 /**
  * Activity for setting the current "theme" of the RetroWatchService.
@@ -38,19 +44,15 @@ public class SelectThemeActivity extends Activity {
 
     private ThemeListViewAdapter themeListViewAdapter;
 
-    private static List<Theme> THEMES = new LinkedList<Theme>();
-
-    static {
-        THEMES.add(new Theme("Theme 1"));
-        THEMES.add(new Theme("Theme 2"));
-        THEMES.add(new Theme("Theme 3"));
-    }
+    private  Themes THEMES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "Into onCreate for Retro configuration activity");
 
         super.onCreate(savedInstanceState);
+
+        initThemes();
 
         setContentView(R.layout.activity_retro_watch_face_configuration);
 
@@ -59,8 +61,41 @@ public class SelectThemeActivity extends Activity {
         themeListView.setAdapter(themeListViewAdapter);
     }
 
-    private List<Theme> getThemes() {
+    private Themes getThemes() {
         return THEMES;
+    }
+
+    private void initThemes() {
+        BufferedReader reader = null;
+        StringBuffer buffer = new StringBuffer();
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(getAssets().open("themes.json")));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+        } catch (IOException iox) {
+            Log.w(TAG, iox);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.w(TAG, e);
+                }
+            }
+        }
+
+        String jsonString = buffer.toString();
+
+        // By the time we get here, 'buffer' contains the JSON string from assets/themes.json
+        Log.i(TAG, "Read themes.json: " + jsonString);
+
+        // Parse the JSON string into an object graph
+        Gson gson = new Gson();
+       THEMES = gson.fromJson(jsonString, Themes.class);
     }
 
     @Override

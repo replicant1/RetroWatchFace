@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import retro.bailey.rod.retrowatchface.R;
+import retro.bailey.rod.retrowatchface.config.Themes;
 
 /**
  * Data source for the list view in the configuration activity. Each item in the list
@@ -24,9 +25,9 @@ public class ThemeListViewAdapter extends WearableListView.Adapter {
 
     private final LayoutInflater inflater;
 
-    private List<Theme> themes;
+    private Themes themes;
 
-    public ThemeListViewAdapter(Context context, List<Theme> themes) {
+    public ThemeListViewAdapter(Context context, Themes themes) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.themes = themes;
@@ -64,13 +65,13 @@ public class ThemeListViewAdapter extends WearableListView.Adapter {
         ThemeListItemViewHolder itemViewHolder = (ThemeListItemViewHolder) holder;
 
         TextView textView = itemViewHolder.getTextView();
-        textView.setText(themes.get(position).getName());
+        textView.setText(themes.themes.get(position).name);
 
         ((ThemeListItemViewHolder) holder).itemView.setTag(position);
     }
 
     @Override
     public int getItemCount() {
-        return themes.size();
+        return themes.themes.size();
     }
 }
