@@ -441,7 +441,7 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
         private void drawDayInTopBar(Canvas canvas) {
             Calendar cal = Calendar.getInstance();
             String dayName = mTime.format("%A");
-            Log.d(TAG, "dayName=" + dayName);
+//            Log.d(TAG, "dayName=" + dayName);
 
             Paint.FontMetricsInt fontMetricsInt = dayNameTextPaint.getFontMetricsInt();
             int dayNameHeightPx = fontMetricsInt.ascent * -1;
@@ -501,8 +501,8 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
                     centerY - ((textFontMetricsInt.ascent + textFontMetricsInt.descent) / 2),
                     timeTextPaint);
 
-            Log.d(TAG, String.format("timeHeightPx= %d, timeWidthPx = %d, centreX = %f, centreY = %f, ascent = %d, descent = %d",
-                    timeHeightPx, timeWidthPx, centerX, centerY, textFontMetricsInt.ascent, textFontMetricsInt.descent));
+//            Log.d(TAG, String.format("timeHeightPx= %d, timeWidthPx = %d, centreX = %f, centreY = %f, ascent = %d, descent = %d",
+//                    timeHeightPx, timeWidthPx, centerX, centerY, textFontMetricsInt.ascent, textFontMetricsInt.descent));
         }
 
         /**
@@ -513,13 +513,13 @@ public class RetroWatchFaceService extends CanvasWatchFaceService {
          */
         private void drawDateInBottomBar(Canvas canvas) {
             String dateStr = mTime.format("%e %B").trim();
-            Log.d(TAG, "dateStr=" + dateStr);
+//            Log.d(TAG, "dateStr=" + dateStr);
 
             Paint.FontMetricsInt textFontMetricsInt = dateTextPaint.getFontMetricsInt();
             int dateHeightPx = textFontMetricsInt.ascent * -1;
             int dateWidthPx = (int) dateTextPaint.measureText(dateStr);
 
-            Log.d(TAG, "dateWidth=" + dateWidthPx);
+//            Log.d(TAG, "dateWidth=" + dateWidthPx);
 
             float centerX = watchFaceWidth / 2.0F;
             float centerYOfBottomBar = watchFaceHeight - marginPx - (shortBarHeightPx / 2);

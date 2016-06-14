@@ -3,9 +3,15 @@ package retro.bailey.rod.retrowatchface.theme;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.wearable.view.WearableListView;
 import android.util.Log;
+import android.widget.ListView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -29,7 +35,10 @@ public class SelectThemeActivity extends Activity {
 
         @Override
         public void onClick(WearableListView.ViewHolder viewHolder) {
-            Log.d(TAG, "onClick: itemId=" + viewHolder.getItemId() + ",tag=" + viewHolder.itemView.getTag());
+            Log.d(TAG, "onClick: itemId=" + viewHolder.getItemId() + ",tag=" + viewHolder.itemView.getTag()
+                    + ",adapterPosition=" + viewHolder.getAdapterPosition());
+//            updateConfigDataItem(viewHolder.)
+            finish();
         }
 
         @Override
@@ -44,7 +53,11 @@ public class SelectThemeActivity extends Activity {
 
     private ThemeListViewAdapter themeListViewAdapter;
 
-    private  Themes THEMES;
+    private Themes THEMES;
+
+    private GoogleApiClient googleApiClient;
+
+    private final ListViewClickListener listViewClickListener = new ListViewClickListener();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +72,45 @@ public class SelectThemeActivity extends Activity {
         themeListViewAdapter = new ThemeListViewAdapter(getApplicationContext(), getThemes());
         themeListView = (WearableListView) findViewById(R.id.wearable_list);
         themeListView.setAdapter(themeListViewAdapter);
+        themeListView.setHasFixedSize(true);
+        themeListView.setClickListener(listViewClickListener);
+//        themeListView.addOnScrollListener();
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+
+                    @Override
+                    public void onConnected(@Nullable Bundle connectionHint) {
+                        Log.d(TAG, "onConnected: " + connectionHint);
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int cause) {
+                        Log.d(TAG, "onConnectionSuspected: " + cause);
+                    }
+                }).addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Log.d(TAG, "onConnectionFailed: " + connectionResult);
+                    }
+                })
+                .addApi(Wearable.API)
+                .build();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        if ((googleApiClient != null) && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+        super.onStop();
     }
 
     private Themes getThemes() {
@@ -95,7 +147,7 @@ public class SelectThemeActivity extends Activity {
 
         // Parse the JSON string into an object graph
         Gson gson = new Gson();
-       THEMES = gson.fromJson(jsonString, Themes.class);
+        THEMES = gson.fromJson(jsonString, Themes.class);
     }
 
     @Override

@@ -64,10 +64,14 @@ public class ThemeListViewAdapter extends WearableListView.Adapter {
     public void onBindViewHolder(WearableListView.ViewHolder holder, int position) {
         ThemeListItemViewHolder itemViewHolder = (ThemeListItemViewHolder) holder;
 
-        TextView textView = itemViewHolder.getTextView();
-        textView.setText(themes.themes.get(position).name);
+        String themeName = themes.themes.get(position).name;
 
-        ((ThemeListItemViewHolder) holder).itemView.setTag(position);
+        TextView textView = itemViewHolder.getTextView();
+        textView.setText(themeName);
+
+        // The tag will contain the theme name. This can be used later as an id
+        // so that when selected, we can retrieve the chosen theme from the Themes database.
+        ((ThemeListItemViewHolder) holder).itemView.setTag(themeName);
     }
 
     @Override
